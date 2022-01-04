@@ -3,7 +3,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -68,6 +71,23 @@ public class Verify extends JavaPlugin implements Listener {
 
         //Register command
         this.getCommand("memumdb").setExecutor(new MemumCommand());
+        
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                try {
+                    ResultSet rs = conn.prepareStatement("SELECT * FROM player LIMIT 1").executeQuery();
+                    if (!rs.next()) {
+                        System.out.println("Database was disconnected. Attempting reconnect...");
+                        instantiateConn(true);
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Database was disconnected. Attempting reconnect...");
+                    instantiateConn(true);
+                }
+            }
+        };
+        timer.schedule(task, 0L, 5000L);
     }
     
     // Fired when plugin is disabled
