@@ -2,10 +2,8 @@ package io.memum.verify;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -77,11 +75,6 @@ public class Verify extends JavaPlugin implements Listener {
 
         //Register command
         this.getCommand("memumdb").setExecutor(new MemumCommand());
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder(
-                URI.create(INSTANCE.config.getString("heartbeat")))
-                .build();
         
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
@@ -93,9 +86,11 @@ public class Verify extends JavaPlugin implements Listener {
                         instantiateConn(true);
                     } else if (!INSTANCE.config.getString("heartbeat").equals("NONE")) {
                         try {
-                            client.send(request, BodyHandlers.ofString());
-                        } catch (IOException | InterruptedException e) {
-                            e.printStackTrace();
+                            URL heartbeat = new URL(INSTANCE.config.getString("heartbeat"));
+                            InputStream is = heartbeat.openStream();
+                            is.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 } catch (SQLException e) {
