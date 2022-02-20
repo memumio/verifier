@@ -1,6 +1,11 @@
 package io.memum.verify;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -60,6 +65,7 @@ public class Verify extends JavaPlugin implements Listener {
         config.addDefault("database", "memum");
         config.addDefault("username", "user");
         config.addDefault("password", "pass");
+        config.addDefault("heartbeat", "NONE");
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -71,6 +77,11 @@ public class Verify extends JavaPlugin implements Listener {
 
         //Register command
         this.getCommand("memumdb").setExecutor(new MemumCommand());
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder(
+                URI.create(INSTANCE.config.getString("heartbeat")))
+                .build();
         
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
@@ -80,6 +91,12 @@ public class Verify extends JavaPlugin implements Listener {
                     if (!rs.next()) {
                         System.out.println("Database was disconnected. Attempting reconnect...");
                         instantiateConn(true);
+                    } else if (!INSTANCE.config.getString("heartbeat").equals("NONE")) {
+                        try {
+                            client.send(request, BodyHandlers.ofString());
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 } catch (SQLException e) {
                     System.out.println("Database was disconnected. Attempting reconnect...");
@@ -87,7 +104,7 @@ public class Verify extends JavaPlugin implements Listener {
                 }
             }
         };
-        timer.schedule(task, 0L, 5000L);
+        timer.schedule(task, 0L, 60000L);
     }
     
     // Fired when plugin is disabled
