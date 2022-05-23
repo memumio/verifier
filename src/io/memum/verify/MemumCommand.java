@@ -20,7 +20,7 @@ public class MemumCommand implements CommandExecutor {
             } else {
                 //Run a simple query to the database to check if it's connected
                 try {
-                    ResultSet rs = Verify.conn.prepareStatement("SELECT * FROM player LIMIT 1").executeQuery();
+                    ResultSet rs = Verify.conn.prepareStatement("SELECT 1").executeQuery();
                     if (!rs.next()) {
                         sender.sendMessage(ChatColor.RED + "The database is currently disconnected.");
                     } else {
