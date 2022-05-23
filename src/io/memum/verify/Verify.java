@@ -80,7 +80,7 @@ public class Verify extends JavaPlugin implements Listener {
         TimerTask task = new TimerTask() {
             public void run() {
                 try {
-                    ResultSet rs = conn.prepareStatement("SELECT * FROM player LIMIT 1").executeQuery();
+                    ResultSet rs = conn.prepareStatement("SELECT 1").executeQuery();
                     if (!rs.next()) {
                         System.out.println("Database was disconnected. Attempting reconnect...");
                         instantiateConn(true);
