@@ -32,7 +32,7 @@ public class JoinEvent implements Listener {
 
 		//Attempt inserting the code into the database
 		try {
-			PreparedStatement stmt = c.prepareStatement("INSERT INTO public.verifications(code, player_id) VALUES (?, (SELECT player_id FROM public.players WHERE player_uuid = ?)) ON CONFLICT(players) DO UPDATE SET code=EXCLUDED.code, timestamp=NOW()");
+			PreparedStatement stmt = c.prepareStatement("INSERT INTO public.verifications(code, player_id) VALUES (?, (SELECT player_id FROM public.players WHERE player_uuid = ?)) ON CONFLICT(player_id) DO UPDATE SET code=EXCLUDED.code, timestamp=NOW()");
 			stmt.setString(1, String.valueOf(num));
 			stmt.setString(2, uuid);
 			stmt.executeUpdate();
