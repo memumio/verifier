@@ -1,0 +1,8 @@
+name: MemumVerifier
+main: io.memum.verify.Verify
+version: 1.1.4
+api-version: 1.13
+commands:
+   memumdb:
+      description: Reload or test the database connection
+      usage: /<command> reload/test
